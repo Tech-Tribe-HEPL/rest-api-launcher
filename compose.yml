@@ -1,0 +1,62 @@
+version: '3'
+services:
+  kong-database:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kong
+    volumes:
+       - ./data:/var/lib/postgresql/data
+    networks:
+      - kong-net
+  # kong-migrations:
+  #   image: "${KONG_DOCKER_TAG:-kong:latest}"
+  #   command: kong migrations bootstrap
+  #   profiles: [ "database" ]
+  #   depends_on:
+  #     - kong-database
+  #   environment:
+  #     KONG_DATABASE: postgres
+  #     KONG_PG_HOST: kong-database
+  #     KONG_PG_USER: kong
+  #     KONG_PG_PASSWORD: kong
+  #   networks:
+  #     - kong-net
+  #   restart: on-failure
+  #Need two command to be started kong migrations bootstrap /
+  kong:
+    image: kong/kong-gateway:latest
+    command: kong migrations bootstrap
+    depends_on:
+      - kong-database
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_URL: http://localhost:8002
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
+    volumes:
+      - kong_tmp_vol:/tmp
+      - ./config/kong:/etc/kong
+    networks:
+      - kong-net
+
+  app:
+    build:
+      context: ./rest-api-medical
+      dockerfile: Dockerfile
+    networks:
+        - kong-net
+
+networks:
+  kong-net:
+
+volumes:
+  kong_tmp_vol:
