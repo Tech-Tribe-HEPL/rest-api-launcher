@@ -7,23 +7,10 @@ services:
       POSTGRES_DB: kong
       POSTGRES_PASSWORD: kong
     volumes:
-       - ./data:/var/lib/postgresql/data
+      - ./data:/var/lib/postgresql/data
     networks:
       - kong-net
-  # kong-migrations:
-  #   image: "${KONG_DOCKER_TAG:-kong:latest}"
-  #   command: kong migrations bootstrap
-  #   profiles: [ "database" ]
-  #   depends_on:
-  #     - kong-database
-  #   environment:
-  #     KONG_DATABASE: postgres
-  #     KONG_PG_HOST: kong-database
-  #     KONG_PG_USER: kong
-  #     KONG_PG_PASSWORD: kong
-  #   networks:
-  #     - kong-net
-  #   restart: on-failure
+
   #Need two command to be started kong migrations bootstrap /
   kong:
     image: kong/kong-gateway:latest
@@ -42,11 +29,14 @@ services:
       - "8443:8443" # HTTPS
       # - "8001:8001" # Admin API
       # - "8444:8444" # Admin API HTTPS
+      # - "8002:8002" # Admin GUI
+      # - "8445:8445" # Admin GUI HTTPS
     volumes:
       - kong_tmp_vol:/tmp
       - ./config/kong:/etc/kong
     networks:
       - kong-net
+      - default
 
   app:
     build:
@@ -55,8 +45,9 @@ services:
     networks:
         - kong-net
 
-networks:
-  kong-net:
+networks: # Both networks are created and work in bridge mode by default and should be able to access any interface on the host I could link one to a loopback to isolate it from the internet but I don't think it's necessary due to the firewall
+  default: #frontend network
+  kong-net: #backend network
 
 volumes:
   kong_tmp_vol:
