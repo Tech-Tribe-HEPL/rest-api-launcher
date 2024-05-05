@@ -1,7 +1,7 @@
 version: '3'
 services:
   kong-database:
-    image: postgres:9.6
+    image: postgres:12
     environment:
       POSTGRES_USER: kong
       POSTGRES_DB: kong
@@ -27,7 +27,7 @@ services:
   #Need two command to be started kong migrations bootstrap /
   kong:
     image: kong/kong-gateway:latest
-    command: kong migrations bootstrap
+    # command: kong migrations bootstrap
     depends_on:
       - kong-database
     environment:
@@ -38,10 +38,10 @@ services:
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
       KONG_ADMIN_GUI_URL: http://localhost:8002
     ports:
-      - "8000:8000"
-      - "8443:8443"
-      - "8001:8001"
-      - "8444:8444"
+      - "8000:8000" # HTTP
+      - "8443:8443" # HTTPS
+      # - "8001:8001" # Admin API
+      # - "8444:8444" # Admin API HTTPS
     volumes:
       - kong_tmp_vol:/tmp
       - ./config/kong:/etc/kong
