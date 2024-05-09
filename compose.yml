@@ -34,10 +34,12 @@ services:
       - kong-net
       - default
 
-  app:
+  medical-api:
     build:
       context: ./rest-api-medical
       dockerfile: Dockerfile
+    env_file:
+      - ./env/medical-api.env
     networks:
         - kong-net
 
