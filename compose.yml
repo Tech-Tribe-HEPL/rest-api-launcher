@@ -11,10 +11,10 @@ services:
     ports:
       - "8000:8000" # HTTP
       - "8443:8443" # HTTPS
-      - "8001:8001" # Admin API
-      - "8444:8444" # Admin API HTTPS
-      - "8002:8002" # Admin GUI
-      - "8445:8445" # Admin GUI HTTPS
+      # - "8001:8001" # Admin API
+      # - "8444:8444" # Admin API HTTPS
+      # - "8002:8002" # Admin GUI
+      # - "8445:8445" # Admin GUI HTTPS
     volumes:
       - kong_tmp_vol:/tmp
       - ./config/kong:/etc/kong
