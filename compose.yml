@@ -1,38 +1,27 @@
-version: '3'
+version: '3.8'
 services:
-  kong-database:
-    image: postgres:12
-    env_file:
-      - ./env/postgresql.env
-    volumes:
-      - ./data:/var/lib/postgresql/data
-    networks:
-      - kong-net
-
   #Need two command to be started kong migrations bootstrap /
   kong:
     image: kong/kong-gateway:latest
-    # command: kong migrations bootstrap
-    depends_on:
-      - kong-database
-    env_file:
-      - ./env/kong.env
     environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
       KONG_ADMIN_GUI_URL: http://localhost:8002
     ports:
       - "8000:8000" # HTTP
       - "8443:8443" # HTTPS
-      # - "8001:8001" # Admin API
-      # - "8444:8444" # Admin API HTTPS
-      # - "8002:8002" # Admin GUI
-      # - "8445:8445" # Admin GUI HTTPS
+      - "8001:8001" # Admin API
+      - "8444:8444" # Admin API HTTPS
+      - "8002:8002" # Admin GUI
+      - "8445:8445" # Admin GUI HTTPS
     volumes:
       - kong_tmp_vol:/tmp
       - ./config/kong:/etc/kong
     networks:
-      - kong-net
-      - default
+      kong-net:
+        ipv4_address: 10.1.1.2
+      default:
 
   medical-api:
     build:
@@ -41,11 +30,16 @@ services:
     env_file:
       - ./env/medical-api.env
     networks:
-        - kong-net
+      kong-net:
+        ipv4_address: 10.1.1.3
 
 networks: # Both networks are created and work in bridge mode by default and should be able to access any interface on the host I could link one to a loopback to isolate it from the internet but I don't think it's necessary due to the firewall
-  default: #frontend network
   kong-net: #backend network
+    ipam:  # Define separate IPAM for gateway
+      config:
+        - subnet: 10.1.1.0/24
+          gateway: 10.1.1.1
+  default: #frontend
 
 volumes:
   kong_tmp_vol:
