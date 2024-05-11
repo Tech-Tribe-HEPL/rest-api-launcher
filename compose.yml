@@ -42,7 +42,7 @@ services:
     build:
       context: ./rest-api-medical
       dockerfile: Dockerfile
-    env:
+    environment:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=bdservices
@@ -51,9 +51,8 @@ services:
     networks:
       kong-net:
         ipv4_address: 10.1.1.3
-  depends_on:
-    - kong
-    - db
+    depends_on:
+      - db
 
 networks: # Both networks are created and work in bridge mode by default and should be able to access any interface on the host I could link one to a loopback to isolate it from the internet but I don't think it's necessary due to the firewall
   kong-net: #backend network
