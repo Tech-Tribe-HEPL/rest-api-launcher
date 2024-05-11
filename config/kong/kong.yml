@@ -1,0 +1,27 @@
+# Example file need to be adapted to the compose file above
+# Note this is temporary and security key provided are false and should be 
+# Based on doc https://docs.konghq.com/gateway/latest/production/deployment-topologies/db-less-and-declarative-config/
+# For jwt plugin https://docs.konghq.com/hub/kong-inc/jwt/how-to/basic-example/
+# To use jwt from oauth https://docs.konghq.com/hub/kong-inc/jwt/#using-the-jwt-plugin-with-auth0
+_format_version: "3.0"
+_transform: true
+
+services:
+- name: medical-api
+  url: http://10.1.1.3:5000
+  routes:
+  - name: get-medical
+    paths:
+    - /medical
+    methods:
+    - GET
+  - name: post-medical
+    paths:
+    - /medical
+    methods:
+    - POST
+  - name : get-medical-specific
+    paths:
+    - /medical/{id}
+    methods:
+    - GET
