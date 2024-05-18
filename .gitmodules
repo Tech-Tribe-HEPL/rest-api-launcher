@@ -6,4 +6,4 @@
 	url = https://github.com/Tech-Tribe-HEPL/authentication-server.git
 [submodule "3d-secure"]
 	path = 3d-secure
-	url = https://github.com/Tech-Tribe-HEPL/3d-secure
+	url = https://github.com/Tech-Tribe-HEPL/3d-secure.git
