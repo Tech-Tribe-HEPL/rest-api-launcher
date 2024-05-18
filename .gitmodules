@@ -1,3 +1,6 @@
 [submodule "rest-api-medical"]
 	path = rest-api-medical
 	url = https://github.com/Tech-Tribe-HEPL/rest-api-medical.git
+[submodule "authentication-server"]
+	path = authentication-server
+	url = https://github.com/Tech-Tribe-HEPL/authentication-server.git
