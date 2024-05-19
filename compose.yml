@@ -1,23 +1,20 @@
 version: '3.8'
 services:
+#### KONG NET
   #Need two command to be started kong migrations bootstrap /
   kong:
     image: kong/kong-gateway:latest
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
-      KONG_ADMIN_LISTEN: 0.0.0.0:8001
-      KONG_ADMIN_GUI_URL: http://localhost:8002
     ports:
       - "8000:8000" # HTTP
       - "8443:8443" # HTTPS
-      # - "8001:8001" # Admin API
-      # - "8444:8444" # Admin API HTTPS
-      # - "8002:8002" # Admin GUI
-      # - "8445:8445" # Admin GUI HTTPS
     volumes:
       - kong_tmp_vol:/tmp
       - ./config/kong:/etc/kong
+      - ./certs/kong.crt:/etc/ssl/certs/kong.crt   //Warning be wary of permission to read the file kong will not start if it can't read the file
+      - ./certs/kong.key:/etc/ssl/certs/kong.key   //Warning be wary of permission to read the file kong will not start if it can't read the file
     networks:
       kong-net:
         ipv4_address: 10.1.1.2
@@ -25,9 +22,8 @@ services:
 
   db:
     image: postgres:12
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: jadoreleprojetintegreetmonsieurcharlet
+    env_file:
+      - env/db.env
     volumes:
       - postgresql:/var/lib/postgresql
       - postgresql_data:/var/lib/postgresql/data
@@ -36,7 +32,7 @@ services:
     networks:
       kong-net:
         ipv4_address: 10.1.1.4
-
+      default:
 
   medical-api:
     build:
@@ -53,6 +49,69 @@ services:
         ipv4_address: 10.1.1.3
     depends_on:
       - db
+#### AUTH NET
+  mongodb:
+    image: mongo:latest
+    env_file:
+      - ./env/mongodb1.env
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo/init_scripts:/docker-entrypoint-initdb.d
+    networks:
+      auth-net:
+        ipv4_address: 10.1.2.2
+
+  # authentification-api:
+  #   build:
+  #     context: ./authentification-server
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - ./env/authentification-api.env
+
+  # mongo2:
+  #   image: mongodb/mongodb-community:latest
+  #   restart: always
+  #   ports:
+  #     - "27018:27017"
+  #   volumes:
+  #     - mongo2_data:/data/db
+  #     - mongo2_config:/data/configdb
+  #   networks:
+  #     - mongoCluster
+  #   healthcheck:
+  #     test: ["CMD", "mongo", "-u", "admin", "-p", "password", "--quiet", "--eval", "db.adminCommand('ping')"]
+  #     interval: 10s
+  #     retries: 5
+  #   environment:
+  #     - MONGO_REPLICASET=myReplicaSet
+  #     - MONGO_INITDB_ROOT_USERNAME=admin
+  #     - MONGO_INITDB_ROOT_PASSWORD=password  # Replace with a strong password
+
+  # mongo3:
+  #   image: mongodb/mongodb-community:latest
+  #   restart: always
+  #   ports:
+  #     - "27019:27017"
+  #   volumes:
+  #     - mongo3_data:/data/db
+  #     - mongo3_config:/data/configdb
+  #   networks:
+  #     - mongoCluster
+  #   healthcheck:
+  #     test: ["CMD", "mongo", "-u", "admin", "-p", "password", "--quiet", "--eval", "db.adminCommand('ping')"]
+  #     interval: 10s
+  #     retries: 5
+  #   environment:
+  #     - MONGO_REPLICASET=myReplicaSet
+  #     - MONGO_INITDB_ROOT_USERNAME=admin
+  #     - MONGO_INITDB_ROOT_PASSWORD=password  # Replace with a strong password
+
+
+
+
+
 
 networks: # Both networks are created and work in bridge mode by default and should be able to access any interface on the host I could link one to a loopback to isolate it from the internet but I don't think it's necessary due to the firewall
   kong-net: #backend network
@@ -60,9 +119,15 @@ networks: # Both networks are created and work in bridge mode by default and sho
       config:
         - subnet: 10.1.1.0/24
           gateway: 10.1.1.1
+  auth-net: #frontend network
+    ipam:  # Define separate IPAM for gateway
+      config:
+        - subnet: 10.1.2.0/24
+          gateway: 10.1.2.1
   default: #frontend
 
 volumes:
   kong_tmp_vol:
   postgresql:
   postgresql_data:
+  mongo-data:

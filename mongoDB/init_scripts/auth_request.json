@@ -1,0 +1,1 @@
+[{"_id":{"$oid":"66487afa2dd98e750a769895"},"type":"mail","requestDate":{"$date":"2024-05-18T09:55:06.925Z"},"terminate":false,"digest":"6ca83","digestReceived":"","userId":"6647b71efea6c034353a9b17","info":"pending","_class":"hepl.masi4.authenticationserver.model.db.AuthenticationRequest"}]

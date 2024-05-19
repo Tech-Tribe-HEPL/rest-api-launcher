@@ -1,0 +1,1 @@
+[{"_id":{"$oid":"6647b71efea6c034353a9b17"},"registerId":"abcdefghi","name":"quentin","lastname":"melis","birthdate":{"$date":"1999-11-10T00:00:00Z"},"genre":"H","phoneNumber":"041234567","pinCode":1234,"cardNumber":"1234","password":"$2y$10$Q9g0S7XaZXN.fK3ugKha6OO1CF3JnPih8GXhqMrgcVny8.Xk0QIhy","enable":true,"email":"quentin.melis@student.hepl.be"}]
