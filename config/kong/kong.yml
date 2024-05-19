@@ -10,18 +10,38 @@ services:
 - name: medical-api
   url: http://10.1.1.3:5000
   routes:
-  - name: get-medical
+  - name: invetory-medical
     paths:
     - /medical
     methods:
     - GET
-  - name: post-medical
-    paths:
-    - /medical
-    methods:
     - POST
   - name : get-medical-specific
     paths:
     - /medical/{id}
     methods:
     - GET
+
+- name: authentification-api
+  url: http://10.1.1.5:5000
+  routes:
+  - name: basic-logging
+    paths:
+    - /auth/login/basic
+    methods:
+      - POST
+  - name : advanced-logging
+    paths:
+      - /auth/login
+    methods:
+    - POST
+  - name : code-validation
+    paths:
+      - /auth/api/code/validation
+    methods:
+      - POST
+  - name: swagger
+    paths:
+      - /auth/swagger-ui/index.html
+    methods:
+      - GET

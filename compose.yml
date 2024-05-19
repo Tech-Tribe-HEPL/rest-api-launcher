@@ -1,7 +1,7 @@
 version: '3.8'
 services:
 #### KONG NET
-  #Need two command to be started kong migrations bootstrap /
+  #Note:kong is not a dependency of the other services it's a gateway -> Can be down other service would just be innacessible but would not crash
   kong:
     image: kong/kong-gateway:latest
     environment:
@@ -13,8 +13,8 @@ services:
     volumes:
       - kong_tmp_vol:/tmp
       - ./config/kong:/etc/kong
-      - ./certs/kong.crt:/etc/ssl/certs/kong.crt   //Warning be wary of permission to read the file kong will not start if it can't read the file
-      - ./certs/kong.key:/etc/ssl/certs/kong.key   //Warning be wary of permission to read the file kong will not start if it can't read the file
+      - ./certs/kong.crt:/etc/ssl/certs/kong.crt   #Warning be wary of permission to read the file kong will not start if it can't read the file
+      - ./certs/kong.key:/etc/ssl/certs/kong.key   #Warning be wary of permission to read the file kong will not start if it can't read the file
     networks:
       kong-net:
         ipv4_address: 10.1.1.2
@@ -50,6 +50,24 @@ services:
     depends_on:
       - db
 #### AUTH NET
+
+  authentification-api:
+    build:
+      context: ./authentication-server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    env_file:
+      - ./env/authentification-api.env
+    networks:
+      auth-net:
+        ipv4_address: 10.1.2.3
+      kong-net:
+        ipv4_address: 10.1.1.5      # Is behind the api gateway to use ssl
+    depends_on:
+      - mongodb
+
+
   mongodb:
     image: mongo:latest
     env_file:
@@ -58,17 +76,12 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
-      - ./mongo/init_scripts:/docker-entrypoint-initdb.d
+      - ./mongoDB/init_scripts:/docker-entrypoint-initdb.d
     networks:
       auth-net:
         ipv4_address: 10.1.2.2
 
-  # authentification-api:
-  #   build:
-  #     context: ./authentification-server
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - ./env/authentification-api.env
+  
 
   # mongo2:
   #   image: mongodb/mongodb-community:latest
