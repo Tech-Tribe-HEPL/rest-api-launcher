@@ -7,3 +7,6 @@
 [submodule "3d-secure"]
 	path = 3d-secure
 	url = https://github.com/Tech-Tribe-HEPL/3d-secure.git
+[submodule "rest-api-beshop"]
+	path = rest-api-beshop
+	url = https://github.com/Tech-Tribe-HEPL/rest-api-beshop
