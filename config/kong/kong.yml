@@ -45,3 +45,16 @@ services:
       - /auth/swagger-ui/index.html
     methods:
       - GET
+
+consumers:
+  - username: api-client
+    jwt_secrets:
+    - algorithm: HS256
+      key: 8d7m2nVSN4u3VBAGVJA8Z7gtDdpwL2vWSRxVPFkki
+      secret: 8b1a9953c4611296a827abf8c47804d7f8fda3e7c08d2ba61e98d4f3a8827d15
+
+
+plugins:
+- name: jwt
+  service: medical-api
+- name: jwt-claims-headers

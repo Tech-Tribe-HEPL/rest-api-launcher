@@ -3,7 +3,9 @@ services:
 #### KONG NET
   #Note:kong is not a dependency of the other services it's a gateway -> Can be down other service would just be innacessible but would not crash
   kong:
-    image: kong/kong-gateway:latest
+    build:
+      context: ./kong
+      dockerfile: Dockerfile
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
@@ -79,9 +81,7 @@ services:
       - ./mongoDB/init_scripts:/docker-entrypoint-initdb.d
     networks:
       auth-net:
-        ipv4_address: 10.1.2.2
-
-  
+        ipv4_address: 10.1.2.2  
 
   # mongo2:
   #   image: mongodb/mongodb-community:latest
@@ -122,8 +122,42 @@ services:
   #     - MONGO_INITDB_ROOT_PASSWORD=password  # Replace with a strong password
 
 
+# 3D - Secure server
+  acq:
+    build:
+      context: ./3d-secure
+      dockerfile: Dockerfile
+    volumes:
+      - ./certs:/opt/secure-transaction/certs
+    ports:
+      - "8888:8888"
+      - "8887:8887"
+    command: ["java","-cp", "secure-transaction-1.0-SNAPSHOT.jar", "hepl.partiallysecure.ACQ" ]
 
+  acs:
+    build:
+      context: ./3d-secure
+      dockerfile: Dockerfile
+    volumes:
+      - ./certs:/opt/secure-transaction/certs
+    ports:
+      - "8090:8090"
+    command: ["java","-cp", "secure-transaction-1.0-SNAPSHOT.jar", "hepl.partiallysecure.ACS" ]
+    depends_on:
+      - acq
 
+  https:
+    build:
+      context: ./3d-secure
+      dockerfile: Dockerfile
+    volumes:
+      - ./certs:/opt/secure-transaction/certs
+    ports:
+      - "8043:8043"
+    command: ["java","-cp", "secure-transaction-1.0-SNAPSHOT.jar", "hepl.partiallysecure.ServeurHTTPS" ]
+    depends_on:
+      - acq
+      - acs
 
 
 networks: # Both networks are created and work in bridge mode by default and should be able to access any interface on the host I could link one to a loopback to isolate it from the internet but I don't think it's necessary due to the firewall
