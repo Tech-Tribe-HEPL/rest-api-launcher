@@ -46,6 +46,8 @@ services:
       - POSTGRES_DB=bdservices
     env_file:
       - ./env/medical-api.env
+    volumes:
+      - ./rest-api-medical:/doc/
     networks:
       kong-net:
         ipv4_address: 10.1.1.3
