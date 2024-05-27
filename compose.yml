@@ -58,8 +58,6 @@ services:
     build:
       context: ./authentication-server
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
     env_file:
       - ./env/authentification-api.env
     networks:
@@ -74,8 +72,6 @@ services:
     image: mongo:latest
     env_file:
       - ./env/mongodb1.env
-    ports:
-      - "27017:27017"
     volumes:
       - mongo-data:/data/db
       - ./mongoDB/init_scripts:/docker-entrypoint-initdb.d
