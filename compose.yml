@@ -54,13 +54,12 @@ services:
     depends_on:
       - db
 #### AUTH NET
-
   authentification-api:
     build:
       context: ./authentication-server
       dockerfile: Dockerfile
     ports:
-      - "5000:8080"
+      - "8080:8080"
     env_file:
       - ./env/authentification-api.env
     networks:
@@ -70,7 +69,6 @@ services:
         ipv4_address: 10.1.1.5      # Is behind the api gateway to use ssl
     depends_on:
       - mongodb
-
 
   mongodb:
     image: mongo:latest
@@ -164,11 +162,13 @@ services:
 
 networks: # Both networks are created and work in bridge mode by default and should be able to access any interface on the host I could link one to a loopback to isolate it from the internet but I don't think it's necessary due to the firewall
   kong-net: #backend network
+    external: false
     ipam:  # Define separate IPAM for gateway
       config:
         - subnet: 10.1.1.0/24
           gateway: 10.1.1.1
   auth-net: #frontend network
+    external: false
     ipam:  # Define separate IPAM for gateway
       config:
         - subnet: 10.1.2.0/24
