@@ -8,7 +8,7 @@ _transform: true
 
 services:
 - name: medical-api
-  url: http://10.1.1.3:5000
+  url: http://10.1.1.3:5000/
   routes:
   - name: inventory-medical
     paths:
@@ -16,56 +16,26 @@ services:
     methods:
     - GET
     - POST
-    plugins:
-    - name: jwt
-      service: medical-api
-    - name: jwt-claims-headers
-  - name : get-medical-specific
-    paths:
-    - /medical/{id}
-    methods:
-    - GET
-  - name : get-medical-doc
-    paths:
-      - /medical/api-docs
-    methods:
-      - GET
 
 - name: authentification-api
-  url: http://10.1.1.5:5000
+  url: http://10.1.1.5:8080
   routes:
   - name: basic-logging
     paths:
-    - /auth/login/basic
+    - /auth/
     methods:
       - POST
-  - name : advanced-logging
-    paths:
-      - /auth/login
-    methods:
-    - POST
-  - name : code-validation
-    paths:
-      - /auth/api/code/validation
-    methods:
-      - POST
-  - name: swagger
-    paths:
-      - /auth/swagger-ui/index.html
-    methods:
       - GET
-
 
 consumers:
   - username: api-client
     jwt_secrets:
     - algorithm: HS256
-      key: 8d7m2nVSN4u3VBAGVJA8Z7gtDdpwL2vWSRxVPFkki
+      key: 8d7m2nVSN4u3VBAGVJA8Z7gtDdpwL2vsWSRxVPFkki
       secret: 8b1a9953c4611296a827abf8c47804d7f8fda3e7c08d2ba61e98d4f3a8827d15
 
 plugins:
 - name: jwt
+  service: medical-api
 - name: jwt-claims-headers
-
-
-
+  service: medical-api
