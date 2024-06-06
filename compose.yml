@@ -60,6 +60,8 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./env/authentification-api.env
+    ports:
+      - 5000:5000
     networks:
       auth-net:
         ipv4_address: 10.1.2.3
