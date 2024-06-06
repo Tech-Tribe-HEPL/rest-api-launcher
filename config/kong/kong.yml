@@ -17,6 +17,16 @@ services:
     - GET
     - POST
 
+- name: beshop-api
+  url: http://10.1.1.6:5000/
+  routes:
+  - name: inventory-beshop
+    paths:
+    - /beshop
+    methods:
+    - GET
+    - POST
+
 - name: authentification-api
   url: http://10.1.1.5:8080
   routes:
@@ -36,6 +46,6 @@ consumers:
 
 plugins:
 - name: jwt
-  service: medical-api
+  service: medical-api #TODO: Add beshop to the jwt confit
 - name: jwt-claims-headers
   service: medical-api
